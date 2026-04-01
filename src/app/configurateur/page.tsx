@@ -2,9 +2,9 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { themes } from "@/data/themes";
+import { supabase } from "@/lib/supabase";
 import type {
-  ThemeId,
+  Theme,
   TableShape,
   Lieu,
   Saison,
@@ -35,13 +35,24 @@ function ConfigurateurContent() {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [cart, setCart] = useState<GeneratedCart | null>(null);
+  const [themes, setThemes] = useState<Theme[]>([]);
 
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [customerEmail, setCustomerEmail] = useState("");
 
+  // Charger les thèmes depuis Supabase
+  useEffect(() => {
+    supabase
+      .from("themes")
+      .select("*")
+      .then(({ data }) => {
+        if (data) setThemes(data as Theme[]);
+      });
+  }, []);
+
   // Form state
-  const [selectedTheme, setSelectedTheme] = useState<ThemeId | "">(
-    (searchParams.get("theme") as ThemeId) || ""
+  const [selectedTheme, setSelectedTheme] = useState<string>(
+    searchParams.get("theme") || ""
   );
   const [guests, setGuests] = useState(80);
   const [tables, setTables] = useState(8);
@@ -73,7 +84,7 @@ function ConfigurateurContent() {
     setLoading(true);
 
     const config: UserConfig = {
-      theme: selectedTheme as ThemeId,
+      theme: selectedTheme,
       guests,
       tables,
       tableShape,

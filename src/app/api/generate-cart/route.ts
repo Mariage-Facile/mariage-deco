@@ -6,7 +6,6 @@ export async function POST(request: NextRequest) {
   try {
     const config: UserConfig = await request.json();
 
-    // Validation basique
     if (!config.theme || !config.guests || !config.tables) {
       return NextResponse.json(
         { error: "Champs obligatoires manquants : theme, guests, tables" },
@@ -28,7 +27,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const cart = generateCart(config);
+    const cart = await generateCart(config);
 
     return NextResponse.json(cart);
   } catch {

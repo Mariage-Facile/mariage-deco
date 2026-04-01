@@ -1,18 +1,10 @@
 // ===== THÈMES =====
-export type ThemeId =
-  | "champetre"
-  | "boheme"
-  | "romantique"
-  | "moderne"
-  | "provencal"
-  | "royal";
-
 export interface Theme {
-  id: ThemeId;
+  id: string;
   name: string;
   description: string;
-  colors: string[]; // couleurs dominantes (hex)
-  image: string; // chemin image preview
+  colors: string[];
+  image: string;
 }
 
 // ===== PRODUITS =====
@@ -39,13 +31,17 @@ export interface Product {
   id: string;
   name: string;
   category: ProductCategory;
-  themes: ThemeId[]; // thèmes compatibles
-  price: number; // prix unitaire TTC en euros
+  themes: string[];
+  price: number;
   image: string;
   description: string;
-  unit: string; // "pièce", "lot de 10", "mètre", etc.
+  unit: string;
   indoor: boolean;
   outdoor: boolean;
+  active?: boolean;
+  cost_price?: number;
+  supplier_ref?: string;
+  stock?: number;
 }
 
 // ===== CONFIGURATION UTILISATEUR =====
@@ -55,7 +51,7 @@ export type Saison = "printemps" | "ete" | "automne" | "hiver";
 export type Budget = "essentiel" | "standard" | "premium";
 
 export interface UserConfig {
-  theme: ThemeId;
+  theme: string;
   guests: number;
   tables: number;
   tableShape: TableShape;
@@ -74,7 +70,7 @@ export interface UserConfig {
 export interface CartItem {
   product: Product;
   quantity: number;
-  reason: string; // explication du calcul (ex: "1 par table × 8 tables")
+  reason: string;
 }
 
 export interface GeneratedCart {

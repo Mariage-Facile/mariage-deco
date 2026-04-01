@@ -1,7 +1,19 @@
 import Link from "next/link";
-import { themes } from "@/data/themes";
+import { createClient } from "@supabase/supabase-js";
+import type { Theme } from "@/lib/types";
 
-export default function HomePage() {
+async function getThemes(): Promise<Theme[]> {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+  const { data } = await supabase.from("themes").select("*");
+  return (data as Theme[]) || [];
+}
+
+export default async function HomePage() {
+  const themes = await getThemes();
+
   return (
     <>
       {/* HERO */}
@@ -87,7 +99,6 @@ export default function HomePage() {
                 href={`/configurateur?theme=${theme.id}`}
                 className="group block bg-[var(--color-bg)] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
               >
-                {/* Color preview */}
                 <div className="h-32 flex">
                   {theme.colors.map((color, i) => (
                     <div
