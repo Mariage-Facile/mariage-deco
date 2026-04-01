@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { generateCart } from "@/lib/cart-engine";
 import { UserConfig } from "@/lib/types";
-import { themes } from "@/data/themes";
+import { supabase } from "@/lib/supabase";
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Générer le panier
-    const cart = generateCart(config);
+    const cart = await generateCart(config);
 
     if (cart.items.length === 0) {
       return NextResponse.json(
@@ -28,8 +28,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const themeName =
-      themes.find((t) => t.id === config.theme)?.name ?? config.theme;
+    const { data: themesData } = await supabase
+      .from("themes")
+      .select("name")
+      .eq("id", config.theme)
+      .single();
+    const themeName = themesData?.name ?? config.theme;
 
     // Créer les line_items Stripe
     const lineItems = cart.items.map((item) => ({
